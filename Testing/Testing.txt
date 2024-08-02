@@ -1,0 +1,148 @@
+Unit Tests and Test Cases
+The module unittest from the Python standard library provides tools for 
+testing your code. A unit test verifies that one specific aspect of a function’s 
+behavior is correct. A test case is a collection of unit tests that together prove 
+that a function behaves as it’s supposed to, within the full range of situations you expect it to handle. A good test case considers all the possible 
+kinds of input a function could receive and includes tests to represent each 
+of these situations. A test case with full coverage includes a full range of unit 
+tests covering all the possible ways you can use a function. Achieving full 
+coverage on a large project can be daunting. It’s often good enough to write 
+tests for your code’s critical behaviors and then aim for full coverage only if 
+the project starts to see widespread use
+
+
+# Read documentation about unittest
+
+Testing a Class
+In the first part of this chapter, you wrote tests for a single function. Now 
+you’ll write tests for a class. You’ll use classes in many of your own programs, so it’s helpful to be able to prove that your classes work correctly. If 
+you have passing tests for a class you’re working on, you can be confident 
+that improvements you make to the class won’t accidentally break its current behavior.
+A Variety of Assert Methods
+Python provides a number of assert methods in the unittest.TestCase class. 
+As mentioned earlier, assert methods test whether a condition you believe is 
+true at a specific point in your code is indeed true. If the condition is true 
+as expected, your assumption about how that part of your program behaves 
+is confirmed; you can be confident that no errors exist. If the condition you 
+assume is true is actually not true, Python raises an exception.
+Table 11-1 describes six commonly used assert methods. With these 
+methods you can verify that returned values equal or don’t equal expected 
+values, that values are True or False, and that values are in or not in a given 
+list. You can use these methods only in a class that inherits from unittest
+.TestCase, so let’s look at how we can use one of these methods in the context of testing an actual class.
+Table 11-1: Assert Methods Available from the unittest Module
+Method Use
+assertEqual(a, b) Verify that a == b
+assertNotEqual(a, b) Verify that a != b
+assertTrue(x) Verify that x is True
+assertFalse(x) Verify that x is False
+assertIn(item, list) Verify that item is in list
+assertNotIn(item, list) Verify that item is not in lis
+
+
+A Class to Test
+Testing a class is similar to testing a function—much of your work involves 
+testing the behavior of the methods in the class. But there are a few differences, so let’s write a class to test. Consider a class that helps administer 
+anonymous surveys:
+survey.py class AnonymousSurvey():
+ """Collect anonymous answers to a survey question."""
+ 
+u def __init__(self, question):
+ """Store a question, and prepare to store responses."""
+ self.question = question
+ self.responses = []
+ 
+v def show_question(self):
+ """Show the survey question."""
+ print(question)
+ 
+w def store_response(self, new_response):
+ """Store a single response to the survey."""
+ self.responses.append(new_response)
+ 
+x def show_results(self):
+ """Show all the responses that have been given."""
+ print("Survey results:")
+ for response in responses:
+ print('- ' + response)
+This class starts with a survey question that you provide u and includes 
+an empty list to store responses. The class has methods to print the survey 
+question v, add a new response to the response list w, and print all the 
+responses stored in the list x. To create an instance from this class, all you 
+224 Chapter 11
+have to provide is a question. Once you have an instance representing a particular survey, you display the survey question with show_question(), store a 
+response using store_response(), and show results with show_results().
+To show that the AnonymousSurvey class works, let’s write a program that 
+uses the class:
+language_ from survey import AnonymousSurvey
+survey.py
+# Define a question, and make a survey.
+question = "What language did you first learn to speak?"
+my_survey = AnonymousSurvey(question)
+# Show the question, and store responses to the question.
+my_survey.show_question()
+print("Enter 'q' at any time to quit.\n")
+while True:
+ response = input("Language: ")
+ if response == 'q':
+ break
+ my_survey.store_response(response)
+# Show the survey results.
+print("\nThank you to everyone who participated in the survey!")
+my_survey.show_results()
+This program defines a question ("What language did you first learn 
+to speak?") and creates an AnonymousSurvey object with that question. The 
+program calls show_question() to display the question and then prompts for 
+responses. Each response is stored as it is received. When all responses have 
+been entered (the user inputs q to quit), show_results() prints the survey 
+results:
+What language did you first learn to speak? 
+Enter 'q' at any time to quit. 
+Language: English
+Language: Spanish
+Language: English
+Language: Mandarin
+Language: q
+Thank you to everyone who participated in the survey! 
+Survey results: 
+- English 
+- Spanish 
+- English
+- Mandari
+
+
+
+The setUp() Method
+In test_survey.py we created a new instance of AnonymousSurvey in each test 
+method, and we created new responses in each method. The unittest.TestCase
+class has a setUp() method that allows you to create these objects once and 
+then use them in each of your test methods. When you include a setUp()
+method in a TestCase class, Python runs the setUp() method before running 
+each method starting with test_. Any objects created in the setUp() method 
+are then available in each test method you write.
+Let’s use setUp() to create a survey instance and a set of responses that 
+can be used in test_store_single_response() and test_store_three_responses():
+import unittest
+from survey import AnonymousSurvey
+class TestAnonymousSurvey(unittest.TestCase):
+ """Tests for the class AnonymousSurvey."""
+ 
+ def setUp(self):
+ """
+ Create a survey and a set of responses for use in all test methods.
+ """
+ question = "What language did you first learn to speak?"
+u self.my_survey = AnonymousSurvey(question)
+v self.responses = ['English', 'Spanish', 'Mandarin']
+ def test_store_single_response(self):
+ """Test that a single response is stored properly."""
+ self.my_survey.store_response(self.responses[0])
+ self.assertIn(self.responses[0], self.my_survey.responses)
+ 
+ def test_store_three_responses(self):
+ """Test that three individual responses are stored properly."""
+ for response in self.responses:
+ self.my_survey.store_response(response)
+ for response in self.responses:
+ self.assertIn(response, self.my_survey.responses)
+unittest.main()

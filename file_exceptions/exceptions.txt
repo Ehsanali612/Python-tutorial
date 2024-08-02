@@ -1,0 +1,5 @@
+Python has special objects called exceptions----> to mange programe that arise 
+during a programe execution .
+if you write  code that handle exceptions to programe will continue runniing 
+exceptions handle with try-except blocks 
+try-except  ---- Asks python to do something 
